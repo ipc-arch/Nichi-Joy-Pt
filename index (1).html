@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ニチジョイ🌸ポイント</title>
+<meta property="og:title" content="ニチジョイ🌸ポイント">
+<meta property="og:description" content="タップひとつで、キャンパスに花を咲かせよう。日本女子体育大学 学内感謝ツール">
+<meta property="og:url" content="https://ipc-arch.github.io/Nichi-Joy-Pt/">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI','Hiragino Sans','Hiragino Kaku Gothic ProN',sans-serif;background:linear-gradient(180deg,#FFF7ED 0%,#FFFBF5 30%,#F0FDF4 100%);min-height:100vh}
+#app{max-width:520px;margin:0 auto;min-height:100vh}
+.header{position:sticky;top:0;z-index:10;background:rgba(255,251,245,.95);backdrop-filter:blur(8px);border-bottom:1px solid #FDE68A;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.title{font-size:18px;font-weight:700;color:#92400E}
+.subtitle{font-size:10px;color:#B45309;margin-top:1px}
+.tab-btn{padding:5px 12px;border-radius:20px;border:none;font-size:12px;cursor:pointer;transition:all .2s}
+.tab-active{font-weight:700;background:#FDE68A;color:#92400E}
+.tab-inactive{font-weight:400;background:transparent;color:#B45309}
+.label{font-size:12px;font-weight:600;color:#92400E;display:block;margin-bottom:6px}
+.section{margin-bottom:16px}
+.from-box{padding:8px 12px;border-radius:12px;background:#FEF3C7;border:1.5px dashed #FDE68A;font-size:14px;color:#92400E;font-weight:600;display:flex;align-items:center;justify-content:space-between}
+.shuffle-btn{background:none;border:none;font-size:16px;cursor:pointer;padding:0 2px}
+.group-btn{padding:6px 11px;border-radius:14px;font-size:12px;cursor:pointer;transition:all .15s;display:inline-block;margin:2px}
+.group-btn-active{border:2px solid #F59E0B;background:#FEF3C7;font-weight:700;color:#92400E}
+.group-btn-selected{border:2px solid #F59E0B;background:#FEF3C7;font-weight:700;color:#92400E}
+.group-btn-default{border:1.5px solid #FDE68A;background:white;font-weight:400;color:#78716C}
+.expand-box{background:#FFFBEB;border-radius:12px;padding:8px 10px;border:1px solid #FDE68A;margin-top:6px;margin-bottom:4px}
+.expand-title{font-size:10px;color:#92400E;font-weight:600;margin-bottom:6px}
+.item-btn{padding:5px 10px;border-radius:12px;font-size:11px;cursor:pointer;transition:all .15s;display:inline-block;margin:2px}
+.item-btn-active{border:2px solid #F59E0B;background:#FEF3C7;font-weight:700;color:#92400E}
+.item-btn-default{border:1px solid #E5E7EB;background:white;font-weight:400;color:#374151}
+.to-btn{padding:9px 15px;border-radius:14px;font-size:14px;cursor:pointer;transition:all .15s;display:inline-block;margin:3px}
+.to-btn-active{border:2px solid #F59E0B;background:#FEF3C7;font-weight:700;color:#92400E}
+.to-btn-default{border:1.5px solid #FDE68A;background:white;font-weight:500;color:#78716C}
+.feel-btn{flex:1;padding:12px 6px;border-radius:14px;cursor:pointer;transition:all .2s;text-align:center}
+.feel-emoji{font-size:26px;margin-bottom:3px}
+.feel-label{font-size:13px}
+.preview{background:white;border-radius:14px;padding:12px 14px;margin-bottom:14px;border:1px solid #FDE68A;font-size:13px;color:#374151;text-align:center;line-height:1.9}
+.send-btn{width:100%;padding:13px;border-radius:14px;border:none;color:white;font-size:15px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .2s}
+.send-btn-active{background:linear-gradient(135deg,#F59E0B,#F97316)}
+.send-btn-disabled{background:#E5E7EB;cursor:default}
+.flower-card{display:inline-flex;flex-direction:column;align-items:center;margin:4px 3px;cursor:default;width:96px;transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .4s ease}
+.date-badge{font-size:12px;font-weight:600;color:#92400E;padding:3px 10px;background:#FEF3C7;border-radius:12px;display:inline-block;margin-bottom:6px}
+.day-container{display:flex;flex-wrap:wrap;justify-content:center;background:rgba(255,255,255,.5);border-radius:16px;padding:6px 2px;margin-bottom:20px}
+.reset-btn{font-size:9px;color:#D1D5DB;background:none;border:none;cursor:pointer}
+.success-overlay{position:fixed;top:0;left:0;right:0;bottom:0;display:flex;justify-content:center;align-items:center;z-index:100;pointer-events:none;background:radial-gradient(circle,rgba(255,251,245,.6) 0%,transparent 70%)}
+@keyframes bloomPop{0%{transform:scale(0) rotate(0);opacity:0}30%{transform:scale(1.4) rotate(15deg);opacity:1}60%{transform:scale(1.1) rotate(-5deg);opacity:.9}100%{transform:scale(2.5) rotate(0);opacity:0}}
+.bloom-anim{font-size:72px;animation:bloomPop 2s ease forwards}
+.selected-org{font-size:12px;color:#92400E;font-weight:600;margin-top:4px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<script>
+// ============================================================
+//  🔧 Firebase設定 — ここを自分のプロジェクトの値に差し替える
+// ============================================================
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyC6TnM-G15g1BE_W1fMZgyBubgUH_lfv3w",
+  authDomain: "nichi-joy-pt.firebaseapp.com",
+  databaseURL: "https://nichi-joy-pt-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "nichi-joy-pt",
+  storageBucket: "nichi-joy-pt.firebasestorage.app",
+  messagingSenderId: "748107549935",
+  appId: "1:748107549935:web:5521ae15982b7b48b45f1a"
+};
+// ============================================================
+
+let db = null;
+let firebaseReady = false;
+
+try {
+  if (FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY") {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.database();
+    firebaseReady = true;
+  }
+} catch(e) { console.warn('Firebase init failed, using localStorage', e); }
+
+// Storage abstraction
+const Storage = {
+  async getMessages() {
+    if (firebaseReady) {
+      const snap = await db.ref('messages').orderByChild('timestamp').once('value');
+      const data = snap.val();
+      if (!data) return [];
+      return Object.values(data).sort((a,b) => b.timestamp.localeCompare(a.timestamp));
+    }
+    return JSON.parse(localStorage.getItem('nichijoy-messages') || '[]');
+  },
+  async addMessage(msg) {
+    if (firebaseReady) {
+      await db.ref('messages/' + msg.id).set(msg);
+    } else {
+      const msgs = JSON.parse(localStorage.getItem('nichijoy-messages') || '[]');
+      msgs.unshift(msg);
+      localStorage.setItem('nichijoy-messages', JSON.stringify(msgs));
+    }
+  },
+  async clearAll() {
+    if (firebaseReady) {
+      await db.ref('messages').remove();
+    } else {
+      localStorage.removeItem('nichijoy-messages');
+    }
+  },
+  onUpdate(callback) {
+    if (firebaseReady) {
+      db.ref('messages').on('value', snap => {
+        const data = snap.val();
+        const msgs = data ? Object.values(data).sort((a,b) => b.timestamp.localeCompare(a.timestamp)) : [];
+        callback(msgs);
+      });
+    }
+  }
+};
+
+// ===== Data =====
+const ORG_GROUPS = [
+  {group:"事務局", items:["教務課","研究支援課","施設管理課","入試・広報課","企画課","学生課","学術情報課","学事課","キャリア支援課"]},
+  {group:"教育・研究", items:["大学教員","上長","大学助手","基礎体力研究所"]},
+  {group:"体育学部", items:["スポーツ科学科","健康スポーツ学科","ダンス学科","子ども運動学科"]},
+  {group:"大学院", items:["スポーツ科学研究科"]},
+  {group:"法人本部", items:["財務部","経理課","管財課","総務課"]},
+  {group:"附属", items:["幼稚園","保育園","二階堂高校"]},
+  {group:"運動部", items:["陸上競技部","水泳部","体操競技部","新体操部","バスケットボール部","バレーボール部","ハンドボール部","サッカー部","ソフトボール部","テニス部","ソフトテニス部","バドミントン部","卓球部","ラクロス部","弓道部","剣道部","柔道部","なぎなた部","少林寺拳法部","フェンシング部","スキー部","スケート部","チアリーディング部","ソングリーディング部","ライフセービング部","軟式野球部","競技ダンス部","舞踊部","モダンダンス部"]},
+  {group:"文化部・同好会", items:["華道部","コーラス部","児童文化部","ダンス・プロデュース研究部","ゴルフ同好会","ストリートダンス同好会","漕艇同好会"]}
+];
+
+const TO_LABELS = [
+  {id:"anohito",label:"あの人"},{id:"anokata",label:"あの方"},
+  {id:"senpai",label:"先輩"},{id:"kouhai",label:"後輩"},
+  {id:"douryou",label:"同僚"},{id:"saruokata",label:"さるお方"}
+];
+
+const FROM_PRE = ["通りすがりの","隠れファンの","感謝しきりの","いつもお世話になってる","ひそかに尊敬する","心の中で拍手する","密かに応援する","こっそり見守る","陰ながら感動してる","ずっと気になってた"];
+const FROM_SUF = ["旅人","仕事人","くろうにん","応援団","同志","見習い","ファン","仲間","チャレンジャー","サポーター"];
+const randomFrom = () => FROM_PRE[Math.random()*FROM_PRE.length|0] + FROM_SUF[Math.random()*FROM_SUF.length|0];
+
+const MSG_TYPES = [
+  {id:"thanks",label:"ありがとう",emoji:"🌸",colors:["#FF6B9D","#FF8FB1","#FFB3C6","#E84887"]},
+  {id:"like",label:"いいね！",emoji:"🌻",colors:["#FFD93D","#FFB347","#FFA07A","#F4A460"]},
+  {id:"awesome",label:"最高！",emoji:"🌺",colors:["#A78BFA","#818CF8","#7C3AED","#6366F1"]}
+];
+
+// ===== Flower SVG =====
+function seededRandom(s){let x=Math.sin(s*9301+49297)*49297;return x-Math.floor(x)}
+function flowerSVG(type, seed, size){
+  const mt = MSG_TYPES.find(m=>m.id===type)||MSG_TYPES[0];
+  const r1=seededRandom(seed),r2=seededRandom(seed+1),r3=seededRandom(seed+2);
+  const pc=Math.floor(r1*3)+5, color=mt.colors[Math.floor(r2*mt.colors.length)];
+  const rot=r3*360, h=size/2, pr=size*.32, cr=size*.15;
+  let svg=`<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">`;
+  for(let i=0;i<pc;i++){
+    const a=(360/pc)*i+rot, rad=a*Math.PI/180;
+    const cx=h+Math.cos(rad)*pr*.55, cy=h+Math.sin(rad)*pr*.55;
+    svg+=`<ellipse cx="${cx}" cy="${cy}" rx="${pr*(.4+r1*.15)}" ry="${pr*(.25+r2*.1)}" fill="${color}" opacity=".85" transform="rotate(${a},${cx},${cy})"/>`;
+  }
+  svg+=`<circle cx="${h}" cy="${h}" r="${cr}" fill="#FFF7AE" stroke="#FFD93D" stroke-width="1"/></svg>`;
+  return svg;
+}
+
+// ===== Helpers =====
+function groupByDate(msgs){
+  const g={};
+  msgs.forEach(m=>{
+    const d=new Date(m.timestamp);
+    const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    (g[k]=g[k]||[]).push(m);
+  });
+  return Object.entries(g).sort((a,b)=>b[0].localeCompare(a[0]));
+}
+function fmtDate(s){
+  const[y,m,d]=s.split('-');
+  const days=["日","月","火","水","木","金","土"];
+  return `${+m}月${+d}日（${days[new Date(+y,+m-1,+d).getDay()]}）`;
+}
+function fmtTime(ts){
+  const d=new Date(ts);
+  return `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+// ===== App State & Render =====
+let state = {
+  messages:[], loading:true, sending:false, view:'send',
+  fromLabel:randomFrom(), toDept:'', toId:'', msgType:'',
+  openGroup:null, showSuccess:false, successEmoji:'🌸', newId:null
+};
+
+function setState(patch){
+  Object.assign(state, patch);
+  render();
+}
+
+function renderFlower(m, isNew){
+  const seed = m.id.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  const mt = MSG_TYPES.find(t=>t.id===m.type)||MSG_TYPES[0];
+  const to = TO_LABELS.find(t=>t.id===m.toId);
+  const toLabel = to ? to.label : m.toId;
+  const style = isNew ? 'transform:scale(0);opacity:0' : '';
+  return `<div class="flower-card" style="${style}" data-new="${isNew?'1':'0'}" title="${m.fromLabel} → ${m.toDept}の${toLabel}\n${mt.label}\n${fmtTime(m.timestamp)}">
+    ${flowerSVG(m.type, seed, 50)}
+    <div style="font-size:9px;color:#6B7280;text-align:center;margin-top:1px;line-height:1.3">${m.toDept}</div>
+    <div style="font-size:11px;font-weight:600;color:#374151;text-align:center">${toLabel}</div>
+    <div style="font-size:9px;color:${mt.colors[3]};font-weight:600">${mt.emoji} ${mt.label}</div>
+    <div style="font-size:7px;color:#D1D5DB">${fmtTime(m.timestamp)}</div>
+  </div>`;
+}
+
+function render(){
+  const s = state;
+  const app = document.getElementById('app');
+  const todayCount = s.messages.filter(m=>new Date(m.timestamp).toDateString()===new Date().toDateString()).length;
+  const canSend = s.toDept && s.toId && s.msgType && !s.sending;
+  const selMt = MSG_TYPES.find(m=>m.id===s.msgType);
+
+  if(s.loading){
+    app.innerHTML = `<div style="display:flex;justify-content:center;align-items:center;height:100vh"><div style="text-align:center;color:#9CA3AF"><div style="font-size:32px;margin-bottom:8px">🌸</div><div>読み込み中...</div>${!firebaseReady?'<div style="font-size:10px;margin-top:8px;color:#F59E0B">⚠ Firebase未設定（ローカルモード）</div>':''}</div></div>`;
+    return;
+  }
+
+  let html = '';
+
+  // Header
+  html += `<div class="header"><div><div class="title">ニチジョイ🌸ポイント</div><div class="subtitle">日本女子体育大学　今日 ${todayCount}輪 ／ 累計 ${s.messages.length}輪${!firebaseReady?' （ローカルモード）':''}</div></div><div style="display:flex;gap:4px">`;
+  ['send','garden'].forEach(v=>{
+    const label = v==='send'?'おくる':'花畑';
+    html += `<button class="tab-btn ${s.view===v?'tab-active':'tab-inactive'}" onclick="setState({view:'${v}'})">${label}</button>`;
+  });
+  html += '</div></div>';
+
+  // Success overlay
+  if(s.showSuccess){
+    html += `<div class="success-overlay"><div class="bloom-anim">${s.successEmoji}</div></div>`;
+  }
+
+  // Send view
+  if(s.view==='send'){
+    html += '<div style="padding:16px 14px">';
+
+    // From
+    html += `<div class="section"><span class="label">あなたは…</span><div class="from-box"><span>🎭 ${s.fromLabel}</span><button class="shuffle-btn" onclick="setState({fromLabel:randomFrom()})">🔀</button></div></div>`;
+
+    // Org picker
+    html += '<div class="section"><span class="label">どこの？</span><div>';
+    ORG_GROUPS.forEach(g=>{
+      const isOpen = s.openGroup===g.group;
+      const hasSel = g.items.includes(s.toDept);
+      const cls = hasSel?'group-btn-selected':isOpen?'group-btn-active':'group-btn-default';
+      html += `<button class="group-btn ${cls}" onclick="setState({openGroup:${isOpen?'null':`'${g.group}'`}})">${g.group}${hasSel?' ✓':''}</button>`;
+    });
+    html += '</div>';
+    if(s.openGroup){
+      const g = ORG_GROUPS.find(x=>x.group===s.openGroup);
+      if(g){
+        html += `<div class="expand-box"><div class="expand-title">${s.openGroup}</div><div>`;
+        g.items.forEach(item=>{
+          const cls = s.toDept===item?'item-btn-active':'item-btn-default';
+          html += `<button class="item-btn ${cls}" onclick="setState({toDept:'${item}',openGroup:null})">${item}</button>`;
+        });
+        html += '</div></div>';
+      }
+    }
+    if(s.toDept) html += `<div class="selected-org">→ ${s.toDept}</div>`;
+    html += '</div>';
+
+    // To
+    html += '<div class="section"><span class="label">だれに？</span><div>';
+    TO_LABELS.forEach(t=>{
+      const cls = s.toId===t.id?'to-btn-active':'to-btn-default';
+      html += `<button class="to-btn ${cls}" onclick="setState({toId:'${t.id}'})">${t.label}</button>`;
+    });
+    html += '</div></div>';
+
+    // Feel
+    html += '<div class="section"><span class="label">きもち</span><div style="display:flex;gap:8px">';
+    MSG_TYPES.forEach(mt=>{
+      const sel = s.msgType===mt.id;
+      const border = sel?`2.5px solid ${mt.colors[0]}`:'1.5px solid #FDE68A';
+      const bg = sel?mt.colors[0]+'15':'white';
+      const transform = sel?'scale(1.05)':'scale(1)';
+      const fw = sel?'700':'500';
+      const clr = sel?mt.colors[3]:'#92400E';
+      html += `<button class="feel-btn" style="border:${border};background:${bg};transform:${transform}" onclick="setState({msgType:'${mt.id}'})"><div class="feel-emoji">${mt.emoji}</div><div class="feel-label" style="font-weight:${fw};color:${clr}">${mt.label}</div></button>`;
+    });
+    html += '</div></div>';
+
+    // Preview
+    if(s.toDept && s.toId && s.msgType){
+      const toLabel = TO_LABELS.find(t=>t.id===s.toId)?.label;
+      html += `<div class="preview"><span style="color:#B45309;font-size:11px">🎭 ${s.fromLabel}</span><span style="color:#9CA3AF"> より</span><br><span style="color:#6B7280;font-size:11px">${s.toDept}の</span> <span style="font-weight:700;color:#92400E;font-size:15px">${toLabel}</span><span style="color:#9CA3AF"> へ</span><br><span style="font-size:20px">${selMt.emoji}</span> <span style="font-weight:700;font-size:15px;color:${selMt.colors[3]}">${selMt.label}</span></div>`;
+    }
+
+    // Send
+    html += `<button class="send-btn ${canSend?'send-btn-active':'send-btn-disabled'}" onclick="handleSend()" ${canSend?'':'disabled'}>${s.sending?'おくっています...':'🌸 花をおくる'}</button>`;
+
+    // Recent mini
+    if(s.messages.length > 0){
+      html += `<div style="margin-top:20px"><div style="font-size:11px;font-weight:600;color:#92400E;margin-bottom:6px;display:flex;justify-content:space-between"><span>さいきんの花</span><button style="font-size:10px;color:#B45309;background:none;border:none;cursor:pointer;text-decoration:underline" onclick="setState({view:'garden'})">すべて見る →</button></div><div style="display:flex;flex-wrap:wrap;justify-content:center">`;
+      s.messages.slice(0,8).forEach(m=>{
+        html += renderFlower(m, m.id===s.newId);
+      });
+      html += '</div></div>';
+    }
+    html += '</div>';
+  }
+
+  // Garden view
+  if(s.view==='garden'){
+    html += '<div style="padding:14px">';
+    if(s.messages.length===0){
+      html += '<div style="text-align:center;padding:40px;color:#9CA3AF"><div style="font-size:48px;margin-bottom:12px">🌱</div><div>まだ花がありません</div><div style="font-size:12px;margin-top:4px">最初のひとつを贈りましょう</div></div>';
+    } else {
+      groupByDate(s.messages).forEach(([dk, msgs])=>{
+        html += `<div><div class="date-badge">${fmtDate(dk)}　🌸 ${msgs.length}輪</div><div class="day-container">`;
+        msgs.forEach(m=>{ html += renderFlower(m, false); });
+        html += '</div></div>';
+      });
+    }
+    html += '</div>';
+  }
+
+  // Reset
+  html += '<div style="text-align:center;padding:16px 0 32px"><button class="reset-btn" onclick="handleReset()">リセット</button></div>';
+
+  app.innerHTML = html;
+
+  // Animate new flowers
+  setTimeout(()=>{
+    document.querySelectorAll('[data-new="1"]').forEach(el=>{
+      el.style.transform='scale(1)';el.style.opacity='1';
+    });
+  }, 50);
+}
+
+async function handleSend(){
+  if(!state.toDept || !state.toId || !state.msgType || state.sending) return;
+  setState({sending:true});
+  const msg = {
+    id: Date.now()+'-'+Math.random().toString(36).slice(2,8),
+    fromLabel: state.fromLabel,
+    toDept: state.toDept,
+    toId: state.toId,
+    type: state.msgType,
+    timestamp: new Date().toISOString()
+  };
+  try {
+    await Storage.addMessage(msg);
+    const mt = MSG_TYPES.find(m=>m.id===state.msgType);
+    setState({
+      messages: [msg, ...state.messages],
+      sending:false, toId:'', msgType:'', toDept:'',
+      fromLabel: randomFrom(),
+      showSuccess:true, successEmoji: mt?.emoji||'🌸', newId: msg.id
+    });
+    setTimeout(()=>setState({showSuccess:false}), 2200);
+    setTimeout(()=>setState({newId:null}), 1500);
+  } catch(e){
+    console.error(e);
+    setState({sending:false});
+  }
+}
+
+async function handleReset(){
+  if(!confirm('すべての花を削除しますか？')) return;
+  await Storage.clearAll();
+  setState({messages:[]});
+}
+
+// Init
+(async()=>{
+  const msgs = await Storage.getMessages();
+  setState({messages:msgs, loading:false});
+  // Real-time updates from Firebase
+  Storage.onUpdate(msgs => setState({messages:msgs}));
+})();
+</script>
+</body>
+</html>
